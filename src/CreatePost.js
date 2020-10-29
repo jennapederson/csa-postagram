@@ -45,9 +45,13 @@ export default function CreatePost({
 
       await Storage.put(formState.image.name, formState.image.fileInfo);
       await API.graphql({
-        query: createPost, variables: { input: postInfo }
+        query: createPost,
+        variables: { input: postInfo },
+        authMode: 'AMAZON_COGNITO_USER_POOLS'
       });
-      updatePosts([...posts, { ...postInfo, image: formState.file }]);
+      const { username } = await Auth.currentAuthenticatedUser(); // new
+      console.log('username', username)
+    updatePosts([...posts, { ...postInfo, image: formState.file, owner: username }]); // updated
       updateFormState(currentState => ({ ...currentState, saving: false }));
       updateOverlayVisibility(false);
     } catch (err) {

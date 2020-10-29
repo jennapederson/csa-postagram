@@ -19,6 +19,7 @@ function Router() {
   /* create a couple of pieces of initial state */
   const [showOverlay, updateOverlayVisibility] = useState(false);
   const [posts, updatePosts] = useState([]);
+  const [myPosts, updateMyPosts] = useState([]);
 
   /* fetch posts when component loads */
   useEffect(() => {
@@ -38,6 +39,9 @@ function Router() {
     setPostState(postsArray);
   }
   async function setPostState(postsArray) {
+    const user = await Auth.currentAuthenticatedUser();
+    const myPostData = postsArray.filter(p => p.owner === user.username);
+    updateMyPosts(myPostData);
     updatePosts(postsArray);
   }
   return (
@@ -50,6 +54,9 @@ function Router() {
             <Switch>
               <Route exact path="/" >
                 <Posts posts={posts} />
+              </Route>
+              <Route exact path="/myposts" >
+                <Posts posts={myPosts} />
               </Route>
               <Route path="/post/:id" >
                 <Post />
